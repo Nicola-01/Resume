@@ -133,54 +133,31 @@ window.addEventListener('scroll', () => {
         const progress = Math.min(Math.max(scrollY / maxScroll, 0), 1);
 
         if (progress > 0) {
-            // Get initial and target positions
-            // We need to calculate this dynamically because window resize might change positions
-            // But for performance, we could cache these if resize is handled
-            
-            // Since heroName is fixed/relative, we need to calculate the delta
-            // However, a simpler approach for smooth animation is to use fixed positioning simulation via transform
-            
-            // Let's use the rects. 
-            // Note: heroName rect changes as we transform it, so we need the ORIGINAL position.
-            // To solve this without complex state, we can calculate the target position relative to the viewport
-            // and the start position relative to the viewport (minus the transform we applied).
-            
-            // Actually, a cleaner way is:
-            // 1. Start: Center of screen (roughly)
-            // 2. End: Top left header position
-            
-            // Let's try a relative approach.
-            // We want to move FROM heroName's original position TO headerLogo's position.
-            
-            // Reset transform to get original rect
-            const currentTransform = heroName.style.transform;
-            heroName.style.transform = 'none';
-            const startRect = heroName.getBoundingClientRect();
-            const endRect = headerLogo.getBoundingClientRect();
-            heroName.style.transform = currentTransform; // Restore
 
-            // Calculate deltas
-            const deltaX = endRect.left - startRect.left;
-            const deltaY = endRect.top - startRect.top;
-            
-            // Calculate scale
-            // Font size ratio is a good approximation for scale
-            // H1 is 3.5rem, Logo is 1.5rem. Ratio approx 0.42
-            // But let's use computed style for accuracy
+            const namePos = heroName.getBoundingClientRect();
+            const logoPos = headerLogo.getBoundingClientRect();
+
+            const deltaY = logoPos.top - namePos.top;
+
             const startSize = parseFloat(window.getComputedStyle(heroName).fontSize);
             const endSize = parseFloat(window.getComputedStyle(headerLogo).fontSize);
             const scale = endSize / startSize;
 
-            // Apply transform based on progress
-            // We use ease-out for smoother feel
-            const ease = 1 - Math.pow(1 - progress, 3); // Cubic ease out
-            
-            const currentX = deltaX * ease;
-            const currentY = deltaY * ease;
+            const ease = 1 - Math.pow(1 - progress, 2.5); // Cubic ease out
             const currentScale = 1 + (scale - 1) * ease;
 
-            heroName.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+            heroName.style.setProperty(
+                'transform', 
+                `scale(${currentScale})`, 
+                'important'
+            );
+
+            headerLogo.style.opacity = deltaY > 0 ? 1 : 0;
+            heroName.style.setProperty('opacity', deltaY > 0 ? 0 : 1, 'important');
+
+
             
+
             // Optional: Fade out the gradient text effect to solid color if needed
             // or keep it as is. The logo has specific color/shadow.
             

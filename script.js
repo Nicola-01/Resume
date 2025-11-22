@@ -106,13 +106,29 @@ updateContent();
 
 
 /* --- 2. KINETIC SCROLL PHYSICS ENGINE & MORPH ANIMATION --- */
+const CONFIG = {
+    // Density: Particles per square centimeter (approximate)
+    particlesPerSqCm: 0.4, 
+    
+    // Connection distance in pixels
+    connectionDistance: 150,
+    
+    // Mouse interaction radius
+    mouseRadius: 150,
+    particlesRadius: 150,
+    
+    // Kinetic scroll friction
+    friction: 0.9,
+    maxVelocity: 0.5
+};
+
 const canvas = document.getElementById('canvas-bg');
 const ctx = canvas.getContext('2d');
-
-// Scroll Physics Variables
+let particles = [];
 let scrollY = window.scrollY;
-let scrollVelocity = 0.1;
 let lastScrollY = scrollY;
+let scrollVelocity = 0;
+let isTouchInteraction = isTouchDevice();
 
 const heroName = document.getElementById('hero-name');
 const headerLogo = document.getElementById('header-logo');
@@ -159,26 +175,18 @@ window.addEventListener('scroll', () => {
     }
 });
 
-let particles = [];
-const particleCount = 120; 
-
 function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
 window.addEventListener('resize', resize);
-resize();
 
 class Particle {
     constructor() {
-        this.reset();
-        // Initialize random positions everywhere
-        this.y = Math.random() * canvas.height;
-    }
-
-    reset() {
+// Spawn randomly across the entire available width/height
         this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height; // Will be overwritten if it goes out of bounds
+        this.y = Math.random() * canvas.height;
+        
         this.vx = (Math.random() - 0.5) * 0.5; 
         this.vy = (Math.random() - 0.5) * 0.5; 
         this.size = Math.random() * 2 + 0.5;
@@ -186,24 +194,20 @@ class Particle {
     }
 
     update() {
-        // Base movement
+// Basic movement
         this.x += this.vx;
         this.y += this.vy;
 
-        // --- KINETIC SCROLL EFFECT ---
-        // Move particles based on scroll velocity.
-        // The minus sign causes particles to move up when scrolling down (parallax effect)
+        // Kinetic Scroll Effect (Parallax)
         this.y -= scrollVelocity * 0.2; 
-        // console.log("update")
 
-        // Horizontal bounce
+        // Boundary Bounce (X-axis)
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
 
-        // Vertical Wrapping (Infinite Loop)
-        // If the particle goes out above, it reappears below and vice versa
+        // Infinite Wrap (Y-axis)
         if (this.y < 0) {
             this.y = canvas.height;
-            this.x = Math.random() * canvas.width; // Change X position for variety
+            this.x = Math.random() * canvas.width; 
         }
         if (this.y > canvas.height) {
             this.y = 0;
@@ -219,17 +223,127 @@ class Particle {
     }
 }
 
-function initParticles() {
-    particles = [];
-    for(let i=0; i<particleCount; i++) {
-        particles.push(new Particle());
+/**
+ * Calculates the optimal number of particles based on screen physical size (cm).
+ * Uses W3C standard: 96px = 1 inch = 2.54 cm
+ */
+function calculateTargetCount() {
+    const widthInches = canvas.width / 96;
+    const heightInches = canvas.height / 96;
+
+    const widthCm = widthInches * 2.54;
+    const heightCm = heightInches * 2.54;
+
+    const areaSqCm = widthCm * heightCm;
+    
+    return Math.floor(areaSqCm * CONFIG.particlesPerSqCm);
+}
+
+/**
+ * Dynamically adds or removes particles to match the new screen size
+ * without resetting the entire animation.
+ */
+let prevWidth = window.innerWidth;
+let prevHeight = window.innerHeight;
+
+function resize() {
+    // 1. Capture the dimensions BEFORE the update (The "Old" Area)
+    const oldW = prevWidth;
+    const oldH = prevHeight;
+
+    // 2. Update Canvas and State to new dimensions
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    prevWidth = canvas.width;
+    prevHeight = canvas.height;
+    
+    // 3. Manage particles passing the Old Dimensions
+    manageParticles(oldW, oldH);
+}
+
+/**
+ * Smartly manages particle count based on screen resize.
+ * - Shrinking: Removes particles closest to the collapsing edges.
+ * - Growing: Spawns particles ONLY in the new empty space (Right or Bottom).
+ */
+function manageParticles(oldW, oldH) {
+    const targetCount = calculateTargetCount();
+    const currentCount = particles.length;
+
+    if (currentCount < targetCount) {
+        // --- ADDITION LOGIC (Screen Grew) ---
+        const toAdd = targetCount - currentCount;
+
+        // We identify two potential "New Zones" to spawn particles:
+        // Zone A (Right Strip): From old Width to new Width
+        // Zone B (Bottom Strip): From old Height to new Height
+        
+        // Calculate the surface area of these zones to distribute particles evenly
+        // (Use Math.max(0, ...) to handle cases where one dimension might shrink while other grows)
+        const areaRight = Math.max(0, (canvas.width - oldW) * canvas.height);
+        const areaBottom = Math.max(0, oldW * (canvas.height - oldH)); // Use oldW to avoid overlapping corner
+        const totalNewArea = areaRight + areaBottom;
+
+        for (let i = 0; i < toAdd; i++) {
+            const p = new Particle();
+            
+            // If totalNewArea is 0 (shouldn't happen in this block, but safety first), 
+            // fallback to random spawn
+            if (totalNewArea <= 0) {
+                particles.push(p);
+                continue;
+            }
+
+            // Randomly decide which zone to spawn in based on their relative size
+            if (Math.random() * totalNewArea < areaRight) {
+                // SPAWN IN RIGHT STRIP
+                // X: Between old boundary and new right edge
+                // Y: Anywhere vertically
+                p.x = oldW + Math.random() * (canvas.width - oldW);
+                p.y = Math.random() * canvas.height;
+            } else {
+                // SPAWN IN BOTTOM STRIP
+                // X: Between 0 and old width (to avoid double density in corner)
+                // Y: Between old boundary and new bottom edge
+                p.x = Math.random() * oldW;
+                p.y = oldH + Math.random() * (canvas.height - oldH);
+            }
+            
+            particles.push(p);
+        }
+
+    } else if (currentCount > targetCount) {
+        // --- REMOVAL LOGIC (Screen Shrank) ---
+        const toRemove = currentCount - targetCount;
+
+        // Sort particles based on how close they are to the Right or Bottom edge.
+        // We calculate the "Escape Distance": min(dist to Right, dist to Bottom)
+        // Lower score = Closer to the collapsing edge = First to die.
+        particles.sort((a, b) => {
+            // Distance for Particle A
+            const distRightA = canvas.width - a.x;
+            const distBottomA = canvas.height - a.y;
+            const scoreA = Math.min(distRightA, distBottomA);
+
+            // Distance for Particle B
+            const distRightB = canvas.width - b.x;
+            const distBottomB = canvas.height - b.y;
+            const scoreB = Math.min(distRightB, distBottomB);
+
+            // Sort Ascending (Smallest score first)
+            return scoreA - scoreB;
+        });
+
+        // Remove the first 'toRemove' particles (the ones closest to edges)
+        particles.splice(0, toRemove);
     }
 }
+
+window.addEventListener('resize', resize);
 
 /* --- MOUSE INTERACTION SETUP --- */
 let mouse = { x: null, y: null, radius: 150 }; // Slightly larger connection radius
 
-let isTouchInteraction = false;
 
 function isTouchDevice() {
     return (('ontouchstart' in window) ||
@@ -238,6 +352,8 @@ function isTouchDevice() {
 }
 
 window.addEventListener('mousemove', (event) => {
+    if (isTouchInteraction) return;
+
     const rect = canvas.getBoundingClientRect();
     
     const scaleX = canvas.width / rect.width;
@@ -253,27 +369,24 @@ window.addEventListener('mouseout', () => {
     mouse.y = null;
 });
 
-let maxV = 0.5
-
-touchDevice = isTouchDevice()
-
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Scroll velocity damping (Friction)
     // At each frame, velocity gradually returns to 0
-    if(Math.abs(scrollVelocity) < maxV) {
-        scrollVelocity = maxV * Math.sign(scrollVelocity);
+    if(Math.abs(scrollVelocity) < CONFIG.maxVelocity) {
+        scrollVelocity = CONFIG.maxVelocity * Math.sign(scrollVelocity);
     }
-    else if (Math.abs(scrollVelocity) > maxV*1.001) {
-        scrollVelocity *= 0.9; 
+    else if (Math.abs(scrollVelocity) > CONFIG.maxVelocity*1.001) {
+        scrollVelocity *= CONFIG.friction; 
     }
 
     particles.forEach((p, index) => {
         p.update();
         p.draw();
+
         // --- 1. POINT-MOUSE CONNECTIONS (NEW) ---
-        if (mouse.x != null && !touchDevice) {
+        if (mouse.x != null) {
             let dx = p.x - mouse.x;
             let dy = p.y - mouse.y;
             let distance = Math.sqrt(dx * dx + dy * dy);
@@ -282,8 +395,8 @@ function animate() {
                 ctx.beginPath();
                 // Opacity calculation: the closer the point, the stronger the line
                 // Using a slightly brighter color (white/purple mix) for cursor interaction
-                let opacity = 1 - (distance / mouse.radius); 
-                ctx.strokeStyle = `rgba(187, 41, 255, ${Math.min(0.1, opacity)})`; 
+                let opacity = Math.min(1 - (distance / mouse.radius), 0.1); 
+                ctx.strokeStyle = `rgba(187, 41, 255, ${opacity})`; 
                 ctx.lineWidth = 1; // Slightly thicker line for mouse connections
                 ctx.moveTo(p.x, p.y);
                 ctx.lineTo(mouse.x, mouse.y);
@@ -301,7 +414,8 @@ function animate() {
             if (distance < 150) {
                 ctx.beginPath();
                 // Line opacity depends on distance
-                ctx.strokeStyle = `rgba(187, 41, 255, ${0.15 - distance/1000})`;
+                const alpha = 0.15 - (distance / 1000);
+                ctx.strokeStyle = `rgba(187, 41, 255, ${alpha})`;
                 ctx.lineWidth = 0.5;
                 ctx.moveTo(p.x, p.y);
                 ctx.lineTo(p2.x, p2.y);
@@ -311,9 +425,6 @@ function animate() {
     });
     requestAnimationFrame(animate);
 }
-
-initParticles();
-animate();
 
 window.addEventListener('beforeprint', function() {
     printPDF();
@@ -351,3 +462,6 @@ function printPDF() {
         isPrinting = false; // Reset flag
     };
 }
+
+animate();
+resize();

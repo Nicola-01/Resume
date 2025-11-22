@@ -3,7 +3,7 @@
     --bg-color: #050505;
     --card-bg: rgba(20, 20, 25, 0.6);
     --primary: #bb29ff;
-    /* Viola Neon */
+    /* Neon Purple */
     --secondary: #5e17eb;
     --text-main: #ffffff;
     --text-muted: #a0a0a0;
@@ -22,7 +22,7 @@ body {
     color: var(--text-main);
     font-family: var(--font-main);
     overflow-x: hidden;
-    /* Importante per evitare scroll orizzontale */
+    /* Important to avoid horizontal scroll */
     line-height: 1.6;
 }
 
@@ -35,7 +35,7 @@ body {
     height: 100%;
     z-index: -1;
     pointer-events: none;
-    /* Lascia passare i click */
+    /* Let clicks pass through */
 }
 
 /* --- LAYOUT & CONTAINER --- */
@@ -92,8 +92,15 @@ header {
     box-shadow: 0 0 15px var(--primary);
 }
 
+#hero-name {
+    transition: transform 0.1s linear;
+    will-change: transform;
+}
+
 /* --- SECTIONS --- */
-section, #hero-name, .role, .skill-tag {
+section,
+.role,
+.skill-tag {
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.8s forwards;
@@ -278,19 +285,19 @@ footer {
 
 @media print {
 
-    /* 1. Nascondi tutto il contenuto del sito */
+    /* 1. Hide all site content */
     body * {
         visibility: hidden;
         height: 0;
-        /* Riduci spazio */
+        /* Reduce space */
         overflow: hidden;
     }
 
-    /* 2. Mostra un messaggio all'utente nella finestra "sbagliata" */
+    /* 2. Show a message to the user in the "wrong" window */
     body::before {
         content: "🖨️ Printing via Browser Menu... \A Please, close this window, and check the other print dialog that opened automatically.";
         white-space: pre-wrap;
-        /* Permette l'a capo con \A */
+        /* Allows line break with \A */
         visibility: visible;
         position: fixed;
         top: 50%;
@@ -298,12 +305,12 @@ footer {
         transform: translate(-50%, -50%);
         font-size: 1.2rem;
         color: #000;
-        /* Nero su bianco per risparmiare inchiostro */
+        /* Black on white to save ink */
         text-align: center;
         font-family: sans-serif;
     }
 
-    /* Forza sfondo bianco per non stampare nero inutile */
+    /* Force white background to avoid printing useless black */
     body,
     html {
         background-color: #fff !important;
@@ -313,4 +320,39 @@ footer {
     canvas {
         display: none !important;
     }
+}
+
+/* --- CUSTOM SCROLLBAR (Cyberpunk Style) --- */
+
+/* 1. Scrollbar width */
+::-webkit-scrollbar {
+    width: 8px; /* Thinner than native (usually 17px) */
+}
+
+/* 2. The Track (Background) */
+::-webkit-scrollbar-track {
+    background: #0a0a0a; /* Deep black, blends with bg */
+    border-left: 1px solid #5815761a; /* Subtle separator line */
+}
+
+/* 3. The Thumb (Draggable part) */
+::-webkit-scrollbar-thumb {
+    background: #860ca580; /* Semi-transparent purple */
+    border-radius: 4px; /* Rounded corners */
+    border: 1px solid transparent; /* Anti-aliasing trick */
+    background-clip: content-box;
+    transition: background 0.3s;
+}
+
+/* 4. Thumb Hover Effect */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary); /* Full neon purple on interaction */
+    box-shadow: 0 0 10px var(--primary); /* Glowing effect */
+}
+
+/* --- FIREFOX SUPPORT (Fallback) --- */
+/* Firefox uses a different syntax */
+html {
+    scrollbar-width: thin; /* Thin width */
+    scrollbar-color: #bb29ff9c #5815761a; /* Thumb Color - Track Color */
 }

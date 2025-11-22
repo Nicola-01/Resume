@@ -128,11 +128,11 @@ window.addEventListener('scroll', () => {
 
     // --- 2. HERO NAME MORPH ANIMATION ---
     if (heroName && headerLogo) {
-        // Calculate progress based on scroll (0 to 300px)
         const maxScroll = 300;
-        const progress = Math.min(Math.max(scrollY / maxScroll, 0), 1);
+        const offset = 100;
+        const progress = Math.min(Math.max((scrollY-offset) / (maxScroll-offset), 0), 1);
 
-        if (progress > 0) {
+        if (progress >= 0) {
 
             const namePos = heroName.getBoundingClientRect();
             const logoPos = headerLogo.getBoundingClientRect();
@@ -143,24 +143,16 @@ window.addEventListener('scroll', () => {
             const endSize = parseFloat(window.getComputedStyle(headerLogo).fontSize);
             const scale = endSize / startSize;
 
-            const ease = 1 - Math.pow(1 - progress, 2.5); // Cubic ease out
+            const ease = 1 - Math.pow(1 - progress, 3); // Cubic ease out
             const currentScale = 1 + (scale - 1) * ease;
 
             heroName.style.setProperty(
                 'transform', 
-                `scale(${currentScale})`, 
-                'important'
+                `scale(${currentScale})`
             );
 
+            heroName.style.opacity = deltaY > 0 ? 0 : 1;
             headerLogo.style.opacity = deltaY > 0 ? 1 : 0;
-            heroName.style.setProperty('opacity', deltaY > 0 ? 0 : 1, 'important');
-
-
-            
-
-            // Optional: Fade out the gradient text effect to solid color if needed
-            // or keep it as is. The logo has specific color/shadow.
-            
         } else {
             heroName.style.transform = 'none';
         }
@@ -180,13 +172,13 @@ resize();
 class Particle {
     constructor() {
         this.reset();
-        // Inizializziamo posizioni random ovunque
+        // Initialize random positions everywhere
         this.y = Math.random() * canvas.height;
     }
 
     reset() {
         this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height; // Verrà sovrascritta se esce dai bordi
+        this.y = Math.random() * canvas.height; // Will be overwritten if it goes out of bounds
         this.vx = (Math.random() - 0.5) * 0.5; 
         this.vy = (Math.random() - 0.5) * 0.5; 
         this.size = Math.random() * 2 + 0.5;
@@ -194,24 +186,24 @@ class Particle {
     }
 
     update() {
-        // Movimento base
+        // Base movement
         this.x += this.vx;
         this.y += this.vy;
 
-        // --- EFFETTO CINETICO SCROLL ---
-        // Muoviamo le particelle in base alla velocità dello scroll.
-        // Il segno meno fa sì che se scendo (scroll giù), le particelle salgano (effetto parallax)
+        // --- KINETIC SCROLL EFFECT ---
+        // Move particles based on scroll velocity.
+        // The minus sign causes particles to move up when scrolling down (parallax effect)
         this.y -= scrollVelocity * 0.2; 
         // console.log("update")
 
-        // Rimbalzo orizzontale
+        // Horizontal bounce
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
 
-        // Wrapping Verticale (Loop infinito)
-        // Se la particella esce sopra, riappare sotto e viceversa
+        // Vertical Wrapping (Infinite Loop)
+        // If the particle goes out above, it reappears below and vice versa
         if (this.y < 0) {
             this.y = canvas.height;
-            this.x = Math.random() * canvas.width; // Cambio posizione X per varietà
+            this.x = Math.random() * canvas.width; // Change X position for variety
         }
         if (this.y > canvas.height) {
             this.y = 0;
@@ -234,13 +226,42 @@ function initParticles() {
     }
 }
 
+/* --- MOUSE INTERACTION SETUP --- */
+let mouse = { x: null, y: null, radius: 150 }; // Slightly larger connection radius
+
+let isTouchInteraction = false;
+
+function isTouchDevice() {
+    return (('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0) ||
+    (navigator.msMaxTouchPoints > 0));
+}
+
+window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    mouse.x = (event.clientX - rect.left) * scaleX;
+    mouse.y = (event.clientY - rect.top) * scaleY;
+});
+
+// Stop drawing lines when mouse leaves the window
+window.addEventListener('mouseout', () => {
+    mouse.x = null;
+    mouse.y = null;
+});
+
 let maxV = 0.5
+
+touchDevice = isTouchDevice()
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Smorzamento della velocità dello scroll (Friction)
-    // Ad ogni frame, la velocità torna gradualmente a 0
+    // Scroll velocity damping (Friction)
+    // At each frame, velocity gradually returns to 0
     if(Math.abs(scrollVelocity) < maxV) {
         scrollVelocity = maxV * Math.sign(scrollVelocity);
     }
@@ -251,8 +272,26 @@ function animate() {
     particles.forEach((p, index) => {
         p.update();
         p.draw();
-        
-        // Connessioni Neurali
+        // --- 1. POINT-MOUSE CONNECTIONS (NEW) ---
+        if (mouse.x != null && !touchDevice) {
+            let dx = p.x - mouse.x;
+            let dy = p.y - mouse.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < mouse.radius) {
+                ctx.beginPath();
+                // Opacity calculation: the closer the point, the stronger the line
+                // Using a slightly brighter color (white/purple mix) for cursor interaction
+                let opacity = 1 - (distance / mouse.radius); 
+                ctx.strokeStyle = `rgba(187, 41, 255, ${Math.min(0.1, opacity)})`; 
+                ctx.lineWidth = 1; // Slightly thicker line for mouse connections
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(mouse.x, mouse.y);
+                ctx.stroke();
+            }
+        }
+
+        // --- 2. NEURAL CONNECTIONS (BETWEEN POINTS) ---
         for (let j = index; j < particles.length; j++) {
             const p2 = particles[j];
             const dx = p.x - p2.x;
@@ -261,7 +300,7 @@ function animate() {
             
             if (distance < 150) {
                 ctx.beginPath();
-                // L'opacità della linea dipende dalla distanza
+                // Line opacity depends on distance
                 ctx.strokeStyle = `rgba(187, 41, 255, ${0.15 - distance/1000})`;
                 ctx.lineWidth = 0.5;
                 ctx.moveTo(p.x, p.y);
@@ -277,21 +316,19 @@ initParticles();
 animate();
 
 window.addEventListener('beforeprint', function() {
-    // Lancia la nostra stampa PDF "forzata"
-    // L'utente vedrà apparire la finestra di stampa del PDF sopra (o sotto) quella del browser
-    triggerCustomPrint();
+    printPDF();
 });
 
 window.addEventListener('keydown', function(e) {
-    // Intercetta CTRL+P (Windows/Linux) o CMD+P (Mac)
+    // Intercept CTRL+P (Windows/Linux) or CMD+P (Mac)
     if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
-        e.preventDefault(); // Blocca la stampa standard
-        printPDF(`cv_${currentLang}.pdf`)
+        e.preventDefault(); // Block standard printing
+        printPDF()
     }
 });
 let isPrinting = false;
-function triggerCustomPrint() {
-    if (isPrinting) return; // Evita doppio lancio
+function printPDF() {
+    if (isPrinting) return; // Avoid double launch
     isPrinting = true;
     
     const url = `cv_${currentLang}.pdf`;
@@ -311,39 +348,6 @@ function triggerCustomPrint() {
             window.open(url, '_blank');
         }
         
-        // Cleanup
-        // setTimeout(() => { 
-        //     document.body.removeChild(iframe);
-        // }, 30000);
         isPrinting = false; // Reset flag
-    };
-}
-
-function printPDF(url) {
-    const iframe = document.createElement('iframe');
-    
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    
-    iframe.src = url;
-    
-    document.body.appendChild(iframe);
-    
-    iframe.onload = function() {
-        try {
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-        } catch (e) {
-            window.open(url, '_blank');
-        }
-        
-        // Pulizia dopo 2 secondi
-        // setTimeout(() => {
-        //     document.body.removeChild(iframe);
-        // }, 20000);
     };
 }

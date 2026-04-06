@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-bgMain text-white font-mono overflow-x-hidden;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-left: 1px solid #5815761a;
+}
+::-webkit-scrollbar-thumb {
+  background: #860ca580;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+  transition: background 0.3s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.primary');
+  box-shadow: 0 0 10px theme('colors.primary');
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #bb29ff9c #5815761a;
+}
+
+@media print {
+  body * {
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
+  }
+  body::before {
+      content: "🖨️ Printing via Browser Menu... \A Please, close this window, and check the other print dialog that opened automatically.";
+      white-space: pre-wrap;
+      visibility: visible;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.2rem;
+      color: #000;
+      text-align: center;
+      font-family: sans-serif;
+  }
+  body, html {
+      background-color: #fff !important;
+      background-image: none !important;
+  }
+  canvas {
+      display: none !important;
+  }
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FullStack Dev Portfolio</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+    <canvas id="canvas-bg"></canvas>
+
+    <div class="container">
+        <header>
+            <h1 class="logo" id="header-logo"></h1>
+            <button class="lang-switch" id="lang-toggle">EN / IT</button>
+        </header>
+
+        <main>
+            <div class="hero">
+                <!-- <p class="role" data-i18n="greeting">Hello World, I am</p> -->
+                <h1 data-i18n="name" id="hero-name">Nicola Busato</h1>
+                <p class="role"><span id="typing-text"></span><span class="cursor">|</span></p>
+                <div style="margin-top: 20px;">
+                    <a href="#contact" class="skill-tag" style="text-decoration: none; color: var(--primary); border-color: var(--text-main);" data-i18n="cta">Contact Me</a>
+                </div>
+            </div>
+
+            <section id="about">
+                <h2 data-i18n="about_title">About Me</h2>
+                <p data-i18n="about_desc" style="color: var(--text-muted); max-width: 700px;">
+                    Passionate developer specializing in building exceptional digital experiences. Currently focused on building accessible, human-centered products.
+                </p>
+            </section>
+
+            <section id="skills">
+                <h2 data-i18n="skills_title">Tech Stack</h2>
+                <div class="skills-grid">
+                    <span class="skill-tag">Java</span>
+                    <span class="skill-tag">C/C++/C#</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">JavaScript</span>
+                    <span class="skill-tag">SQL</span><!-- / NoSQL -->
+                    <span class="skill-tag">Docker</span>
+                    <span class="skill-tag">Git</span>
+                    <!-- <span class="skill-tag">React / Vue</span> -->
+                    <!-- <span class="skill-tag">Node.js</span> -->
+                    <!-- <span class="skill-tag">AWS</span> -->
+                </div>
+            </section>
+
+            <section id="projects">
+                <h2 data-i18n="projects_title">Selected Projects</h2>
+                <div class="project-grid">
+                    <div class="card">
+                        <h3>E-Commerce API</h3>
+                        <p data-i18n="proj1_desc">A scalable RESTful API built with Node.js and MongoDB. Handles authentication and payments.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Dashboard Analytics</h3>
+                        <p data-i18n="proj2_desc">Real-time data visualization dashboard using React and D3.js with WebSocket integration.</p>
+                    </div>
+                    <div class="card">
+                        <h3>AI Chat Interface</h3>
+                        <p data-i18n="proj3_desc">Responsive chat UI integrated with OpenAI API, featuring dark mode and history storage.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Cyber Security Tool</h3>
+                        <p>Automated penetration testing script written in Python.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Cloud Infrastructure</h3>
+                        <p>AWS Lambda serverless architecture managed via Terraform.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact">
+                <h2 data-i18n="contact_title">Get In Touch</h2>
+                <p data-i18n="contact_desc" style="color: var(--text-muted); margin-bottom: 20px;">
+                    My inbox is always open. Whether you have a question or just want to say hi, I'll try my best to get back to you!
+                </p>
+                <a href="mailto:email@example.com" class="skill-tag" style="text-decoration: none;">email@example.com</a>
+            </section>
+        </main>
+
+        <footer>
+            <p>Built with pure HTML, CSS & JS.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

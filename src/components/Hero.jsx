@@ -34,23 +34,23 @@ const Hero = () => {
 
     return (
         <div className="h-[80vh] flex flex-col justify-center items-start relative pt-20">
-            <div className="relative min-h-[85px] mb-6 flex items-center">
+            <div className="relative min-h-[60px] md:min-h-[85px] mb-6 flex items-center">
                 {/* Glow effect behind title - mapped to scroll via opacity later if needed, but for now static */}
                 <div className="absolute top-0 left-0 w-full h-full blur-[100px] -z-10 rounded-full"></div>
                 
                 {/* Invisible placeholder to measure the exact coordinates for the Header's scroll-linked title */}
                 <h1 
                     id="hero-title-placeholder"
-                    className="text-5xl md:text-7xl font-bold uppercase tracking-widest opacity-0 m-0 pointer-events-none"
+                    className="text-4xl md:text-7xl font-bold uppercase tracking-widest opacity-0 m-0 pointer-events-none"
                 >
                     Nicola Busato
                 </h1>
             </div>
             
-            <p className="text-textMuted text-2xl mb-8 flex items-center">
+            <p className="text-textMuted text-xl md:text-2xl mb-8 flex items-center">
                 <span className="text-secondary mr-2">&lt; </span>
                 <span>{currentRole.substring(0, charIndex)}</span>
-                <span className="inline-block w-[10px] text-primary animate-pulse ml-1">|</span>
+                <span className="inline-block w-[8px] md:w-[10px] text-primary animate-pulse ml-1">|</span>
                 <span className="text-secondary ml-2"> /&gt;</span>
             </p>
 

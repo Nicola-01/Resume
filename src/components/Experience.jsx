@@ -41,16 +41,16 @@ const Experience = () => {
     ];
 
     return (
-        <section id="experience" className="py-20 animate-fade-in-up" style={{ animationDelay: '0.35s', opacity: 0, animationFillMode: 'forwards' }}>
-            <h2 className="text-primary border-l-4 border-primary pl-4 uppercase tracking-widest text-2xl mb-8">
+        <section id="experience" className="py-12 md:py-20 animate-fade-in-up" style={{ animationDelay: '0.35s', opacity: 0, animationFillMode: 'forwards' }}>
+            <h2 className="text-primary border-l-4 border-primary pl-4 uppercase tracking-widest text-xl md:text-2xl mb-8">
                 {t('exp_title')}
             </h2>
 
-            <div className="relative border-l-2 border-white/10 ml-4 md:ml-6 pl-8 md:pl-10 space-y-12">
+            <div className="relative border-l-2 border-white/10 ml-2 md:ml-6 pl-6 md:pl-10 space-y-12">
                 {experiences.map((exp, index) => (
                     <div key={index} className="relative group">
                         {/* Timeline Node */}
-                        <div className={`absolute -left-[41px] md:-left-[49px] top-1.5 w-5 h-5 rounded-full bg-bgMain border-2 z-10 transition-all duration-300 ${
+                        <div className={`absolute -left-[33px] md:-left-[49px] top-1.5 w-5 h-5 rounded-full bg-bgMain border-2 z-10 transition-all duration-300 ${
                             exp.current 
                                 ? 'border-primary shadow-[0_0_10px_#bb29ff]' 
                                 : 'border-secondary shadow-[0_0_8px_#5e17eb]'

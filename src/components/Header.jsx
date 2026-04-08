@@ -38,7 +38,7 @@ const Header = () => {
     // Map scrollY to y-offset
     const yTransform = useTransform(scrollY, [0, Math.max(startPos, 1)], [startPos, 0]);
     // Map scrollY to scale
-    const scaleTransform = useTransform(scrollY, [0, Math.max(startPos, 1)], [window.innerWidth < 768 ? 2.4 : 3.6, 1]);
+    const scaleTransform = useTransform(scrollY, [0, Math.max(startPos, 1)], [window.innerWidth < 768 ? 1.8 : 3.6, 1]);
 
     return (
         <header className={`fixed top-0 w-full z-[100] transition-all duration-300 border-b ${scrolled ? 'backdrop-blur-xl bg-bgMain/70 py-3 shadow-lg shadow-primary/5 border-primary/20' : 'bg-transparent py-5 border-transparent'}`}>

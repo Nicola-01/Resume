@@ -64,8 +64,8 @@ const Projects = () => {
     ];
 
     return (
-        <section id="projects" className="py-20 animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0, animationFillMode: 'forwards' }}>
-            <h2 className="text-primary border-l-4 border-primary pl-4 uppercase tracking-widest text-2xl mb-8">
+        <section id="projects" className="py-12 md:py-20 animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0, animationFillMode: 'forwards' }}>
+            <h2 className="text-primary border-l-4 border-primary pl-4 uppercase tracking-widest text-xl md:text-2xl mb-8">
                 {t('projects_title')}
             </h2>
             <div className="space-y-6">
@@ -85,7 +85,7 @@ const Projects = () => {
                             {/* Left accent bar */}
                             <div className={`absolute left-0 top-0 w-1 h-full ${isPrimary ? 'bg-gradient-to-b from-primary to-primary/20' : 'bg-gradient-to-b from-secondary to-secondary/20'} opacity-40 group-hover:opacity-80 transition-opacity duration-500`}></div>
 
-                            <div className="relative z-10 p-6 md:p-8">
+                            <div className="relative z-10 p-5 md:p-8">
                                 {/* Invisible Full Card Link */}
                                 {proj.link && (
                                     <a 

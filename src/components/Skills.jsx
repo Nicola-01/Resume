@@ -78,8 +78,8 @@ const Skills = () => {
     ];
 
     return (
-        <section id="skills" className="py-20 animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0, animationFillMode: 'forwards' }}>
-            <h2 className="text-primary border-l-4 border-primary pl-4 uppercase tracking-widest text-2xl mb-8">
+        <section id="skills" className="py-12 md:py-20 animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0, animationFillMode: 'forwards' }}>
+            <h2 className="text-primary border-l-4 border-primary pl-4 uppercase tracking-widest text-xl md:text-2xl mb-8">
                 {t('skills_title')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

@@ -11,6 +11,7 @@ export default {
         secondary: "#5e17eb",
         bgMain: "#050505",
         cardBg: "rgba(20, 20, 25, 0.6)",
+        textMuted: "#9ca3af",
       },
       fontFamily: {
         mono: ['Courier New', 'Courier', 'monospace'],

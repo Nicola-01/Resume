@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
+import Experience from './components/Experience';
 import Education from './components/Education';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
@@ -64,9 +65,10 @@ function App() {
         <main className="container mx-auto px-4 max-w-5xl pb-20">
           <Hero />
           <About />
-          <Projects />
-          <Education />
           <Skills />
+          <Projects />
+          <Experience />
+          <Education />
           <Contact />
         </main>
         

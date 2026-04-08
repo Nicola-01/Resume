@@ -13,11 +13,9 @@ const Contact = () => {
                 <p className="text-textMuted text-lg mb-8 leading-relaxed w-full">
                     {t('contact_desc')}
                 </p>
-                <a 
-                    href="mailto:email@example.com" 
-                    className="inline-block bg-primary/10 border border-primary text-primary px-8 py-3 rounded hover:bg-primary hover:text-black hover:shadow-[0_0_20px_#bb29ff] transition-all duration-300 font-mono"
-                >
-                    email@example.com
+                <a className="inline-block bg-primary/10 border border-primary text-primary px-8 py-3 rounded hover:bg-primary hover:text-black hover:shadow-[0_0_20px_#bb29ff] transition-all duration-300 font-mono"
+                href="mailto:&#110;&#105;&#99;&#111;&#108;&#97;&#46;&#98;&#117;&#115;&#97;&#116;&#111;&#46;&#50;&#48;&#48;&#49;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;">
+                    &#110;&#105;&#99;&#111;&#108;&#97;&#46;&#98;&#117;&#115;&#97;&#116;&#111;&#46;&#50;&#48;&#48;&#49;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;
                 </a>
             </div>
         </section>

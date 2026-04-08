@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from '../TranslationContext';
 
 const ExternalLinkIcon = () => (
-    <svg className="w-5 h-5 text-primary/60 group-hover:text-primary transition-colors duration-300 transform group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+    <svg className="w-5 h-5 text-primary/60 group-hover:text-primary transition-colors duration-300 transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
 );
 
 const ChevronIcon = () => (
@@ -86,17 +86,22 @@ const Projects = () => {
                             <div className={`absolute left-0 top-0 w-1 h-full ${isPrimary ? 'bg-gradient-to-b from-primary to-primary/20' : 'bg-gradient-to-b from-secondary to-secondary/20'} opacity-40 group-hover:opacity-80 transition-opacity duration-500`}></div>
 
                             <div className="relative z-10 p-6 md:p-8">
+                                {/* Invisible Full Card Link */}
+                                {proj.link && (
+                                    <a 
+                                        href={proj.link} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="absolute inset-0 z-20"
+                                        aria-label={`View project details for ${t(proj.titleKey)}`}
+                                    ></a>
+                                )}
+
                                 {/* Header row */}
-                                <div className="flex flex-row items-center justify-between gap-4 mb-4">
+                                <div className="flex flex-row items-center justify-between gap-4 mb-4 relative z-30 pointer-events-none">
                                     <div>
-                                        <h3 className="text-xl md:text-2xl font-bold text-white flex items-center relative z-10">
-                                            {proj.link ? (
-                                                <a href={proj.link} target="_blank" rel="noopener noreferrer" className="before:absolute before:-inset-8 before:z-0 focus:outline-none hover:text-primary transition-colors">
-                                                    {t(proj.titleKey)}
-                                                </a>
-                                            ) : (
-                                                t(proj.titleKey)
-                                            )}
+                                        <h3 className="text-xl md:text-2xl font-bold text-white flex items-center">
+                                            {t(proj.titleKey)}
                                         </h3>
                                         {proj.subtitleKey && (
                                             <span className="text-primary/60 font-mono text-sm mt-1 inline-block">
@@ -129,7 +134,7 @@ const Projects = () => {
                                 )}
 
                                 {/* Tags */}
-                                <div className="flex flex-wrap gap-2 relative z-20">
+                                <div className="flex flex-wrap gap-2 relative z-30 text-white/50">
                                     {proj.tags.map(tag => (
                                         <span key={tag} className={`text-xs font-mono px-2.5 py-1 rounded-md ${isPrimary ? 'text-primary bg-primary/10 border border-primary/20' : 'text-secondary bg-secondary/10 border border-secondary/20'}`}>
                                             {tag}
@@ -139,7 +144,7 @@ const Projects = () => {
 
                                 {/* GitHub Link */}
                                 {proj.github && (
-                                    <div className="mt-5 relative z-20">
+                                    <div className="mt-5 relative z-30">
                                         <a
                                             href={proj.github}
                                             target="_blank"
